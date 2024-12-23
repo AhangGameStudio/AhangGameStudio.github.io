@@ -1,4 +1,5 @@
 body{
+	z-index: -1;
 	background-image: url("../sp-img/宣传图6.png");
 }
 
