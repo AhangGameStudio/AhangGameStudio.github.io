@@ -11,11 +11,6 @@ body{
 	padding: 20px;
 }
 
-.dhl{
-	background-color: aqua;
-	
-}
-
 .wz{
 	color: brown;
 }
@@ -24,7 +19,7 @@ body{
 	width: 450px;
 	height: 560px;
 	margin-top: 0px;
-	margin-left: 0px;
+	margin-left: 540px;
 	border-radius: 25px;
 	border: 2px solid #8AC007;
 	padding: 20px;
