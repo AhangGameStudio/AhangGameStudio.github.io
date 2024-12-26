@@ -1,21 +1,109 @@
 <!DOCTYPE html>
-<html>
-	<head>
-		<meta charset="utf-8">
-		<title>无限之旅官方网站</title>
-		<link rel="stylesheet" type="text/css" href="css/index.css">
-	</head>
-	<body>
-		<div class="sp">
-			<ul class="dhl">
-				<h3 class="wz">无限之旅官方网站</h3>
-				<li>
-					服务器IP：mc.zzlx.fun
-				</li>
-			</ul>
-		</div>
-		<div class="ggl">
-			
-		</div>
-	</body>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>登录页面</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+   .login-container {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 5px;
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+      width: 300px;
+    }
+    h2 {
+      text-align: center;
+    }
+    form {
+      display: flex;
+      flex-direction: column;
+    }
+    label {
+      margin-top: 10px;
+    }
+    input {
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 3px;
+    }
+    button {
+      padding: 10px;
+      background-color: #007BFF;
+      color: #fff;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+      margin-top: 15px;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+   .error-message {
+      color: red;
+      font-size: 14px;
+      margin-top: 10px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <h2>登录</h2>
+    <form id="loginForm">
+      <label for="username">用户名：</label>
+      <input type="text" id="username" required>
+      <label for="password">密码：</label>
+      <input type="password" id="password" required>
+      <button type="submit">登录</button>
+    </form>
+    <div class="error-message" id="errorMessage">用户名和密码不能为空。</div>
+  </div>
+
+  <script>
+    document.getElementById('loginForm').addEventListener('submit', function(event) {
+      event.preventDefault(); // 阻止表单的默认提交行为
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+      const errorMessage = document.getElementById('errorMessage');
+
+      if (username === '' || password === '') {
+        errorMessage.style.display = 'block'; // 显示错误消息
+        return;
+      } else {
+        errorMessage.style.display = 'none'; // 隐藏错误消息
+        // 这里可以添加代码将用户名和密码发送到服务器进行验证，例如使用 AJAX
+        console.log('用户名:', username);
+        console.log('密码:', password);
+        // 假设使用 fetch API 发送请求
+        // fetch('/login', {
+        //   method: 'POST',
+        //   body: JSON.stringify({ username: username, password: password }),
+        //   headers: {
+        //     'Content-Type': 'application/json'
+        //   }
+        // }).then(response => response.json())
+        //.then(data => {
+        //   if (data.success) {
+        //     alert('登录成功');
+        //   } else {
+        //     alert('登录失败，请检查用户名和密码。');
+        //   }
+        // }).catch(error => {
+        //   console.error('请求错误:', error);
+        // });
+      }
+    });
+  </script>
+</body>
 </html>
