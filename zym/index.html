@@ -1,49 +1,363 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 	<head>
-		<meta charset="utf-8">
-		<title>阿航的官方网站</title>
+		<meta charset="UTF-8">
+		<title>赛博空间站 - 胡智航</title>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 		<style>
-			.ht {
-				border-radius: 25px;
-				border: 2px solid #8AC007;
-				padding: 20px width: 100%;
-				height: 200px;
-				background-color: aqua;
+			/* 赛博朋克基础样式 */
+			:root {
+				--neon-blue: #0ff;
+				--neon-pink: #f0f;
+				--matrix-green: #0f0;
+				--cyber-dark: #000814;
+				--hacker-yellow: #ffd700;
 			}
 
-			.red {
-				color: red;
-				margin-top: -25px;
-				margin-left: 690px;
+			body {
+				margin: 0;
+				background: var(--cyber-dark);
+				color: var(--neon-blue);
+				font-family: 'Orbitron', sans-serif;
+				min-height: 100vh;
+				overflow-x: hidden;
 			}
 
-			#clock {
-				font: bold 24pt sans;
-				background: #ddf;
-				padding: 10px;
-				border: solid black 2px;
-				border-radius: 10px;
-				margin-top: 0px;
-				margin-left: 690px;
+			/* 动态网格背景 */
+			.cyber-grid {
+				position: fixed;
+				width: 100vw;
+				height: 100vh;
+				background-image:
+					linear-gradient(rgba(0, 255, 255, 0.1) 1px, transparent 1px),
+					linear-gradient(90deg, rgba(0, 255, 255, 0.1) 1px, transparent 1px);
+				background-size: 20px 20px;
+				z-index: -2;
+			}
+
+			/* 扫描线特效 */
+			.scanline {
+				position: fixed;
+				width: 100%;
+				height: 2px;
+				background: linear-gradient(transparent 0%, var(--matrix-green) 50%, transparent 100%);
+				animation: scan 3s linear infinite;
+				z-index: 999;
+			}
+
+			/* 主容器 */
+			.cyber-container {
+				max-width: 1200px;
+				margin: 0 auto;
+				padding: 2rem;
+				position: relative;
+			}
+
+			/* 3D悬浮导航 */
+			.cyber-nav {
+				display: flex;
+				justify-content: space-between;
+				padding: 1rem;
+				background: rgba(0, 0, 0, 0.9);
+				border: 2px solid var(--neon-blue);
+				margin-bottom: 2rem;
+				transform-style: preserve-3d;
+				transition: transform 0.3s;
+			}
+
+			.cyber-nav:hover {
+				transform: rotateX(5deg) rotateY(5deg);
+			}
+
+			/* 全息投影内容区 */
+			.hologram-panel {
+				padding: 2rem;
+				background: rgba(0, 0, 0, 0.8);
+				border: 1px solid var(--neon-pink);
+				margin: 2rem 0;
+				position: relative;
+				transition: transform 0.3s;
+			}
+
+			.hologram-panel::before {
+				content: "";
+				position: absolute;
+				top: -5px;
+				left: -5px;
+				right: -5px;
+				bottom: -5px;
+				background: linear-gradient(45deg,
+						var(--neon-blue),
+						var(--neon-pink),
+						var(--matrix-green));
+				z-index: -1;
+				animation: borderGlow 3s linear infinite;
+			}
+
+			/* 数据可视化 */
+			.data-wall {
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+				gap: 2rem;
+				padding: 2rem;
+			}
+
+			/* 技能进度条 */
+			.skill-bar {
+				background: rgba(0, 0, 0, 0.7);
+				padding: 1rem;
+				margin: 1rem 0;
+				position: relative;
+			}
+
+			.skill-progress {
+				height: 20px;
+				background: linear-gradient(90deg, var(--neon-pink), var(--neon-blue));
+				width: 0;
+				transition: width 1s ease;
+			}
+
+			/* 动态交互按钮 */
+			.cyber-button {
+				padding: 1rem 2rem;
+				background: none;
+				border: 2px solid var(--neon-blue);
+				color: var(--neon-blue);
+				cursor: pointer;
+				position: relative;
+				overflow: hidden;
+				transition: 0.3s;
+			}
+
+			.cyber-button:hover {
+				box-shadow: 0 0 15px var(--neon-blue);
+				text-shadow: 0 0 10px var(--neon-blue);
+			}
+
+			/* 动画定义 */
+			@keyframes scan {
+				0% {
+					transform: translateY(-100%);
+				}
+
+				100% {
+					transform: translateY(100vh);
+				}
+			}
+
+			@keyframes borderGlow {
+				0% {
+					opacity: 0.2;
+				}
+
+				50% {
+					opacity: 1;
+				}
+
+				100% {
+					opacity: 0.2;
+				}
+			}
+
+			/* 粒子背景 */
+			#particles {
+				position: fixed;
+				width: 100%;
+				height: 100%;
+				z-index: -1;
 			}
 		</style>
 	</head>
 	<body>
-		<div class="ht">
-			<h1>
-				<p class="red">阿航的官方网站</p>
-			</h1>
-			<span id="clock"></span>
+		<div class="cyber-grid"></div>
+		<div class="scanline"></div>
+		<div id="particles"></div>
+
+		<nav class="cyber-nav">
+			<div class="cyber-brand">胡智航</div>
+			<div class="nav-links">
+				<button class="cyber-button" onclick="toggleTheme()">主题切换</button>
+				<button class="cyber-button" onclick="toggleMusic()">背景音效</button>
+			</div>
+		</nav>
+
+		<div class="cyber-container">
+			<!-- 个人信息全息投影 -->
+			<section class="hologram-panel">
+				<h2>数字身份档案</h2>
+				<div class="data-wall">
+					<div class="cyber-card">
+						<h3>个人数据</h3>
+						<p>代号: Neon_Coder</p>
+						<p>职业: 全栈黑客</p>
+						<p>技能等级: Lv.99</p>
+					</div>
+					<div class="cyber-card">
+						<h3>实时状态</h3>
+						<p>网络连接: 加密通道</p>
+						<p>系统防护: 量子加密</p>
+						<p>能量储备: ▮▮▮▮▮ 98%</p>
+					</div>
+				</div>
+			</section>
+
+			<!-- 技能矩阵 -->
+			<section class="hologram-panel">
+				<h2>技能矩阵</h2>
+				<div class="skill-bar">
+					<span>量子编程</span>
+					<div class="skill-progress" style="width: 95%"></div>
+				</div>
+				<div class="skill-bar">
+					<span>数据破解</span>
+					<div class="skill-progress" style="width: 88%"></div>
+				</div>
+				<div class="skill-bar">
+					<span>AI驯化</span>
+					<div class="skill-progress" style="width: 92%"></div>
+				</div>
+			</section>
+
+			<!-- 数据仪表盘 -->
+			<section class="hologram-panel">
+				<h2>神经接口仪表盘</h2>
+				<div class="data-wall">
+					<canvas id="main-chart"></canvas>
+					<div id="system-monitor"></div>
+				</div>
+			</section>
 		</div>
+
+		<audio id="bgm" loop>
+			<source src="https://assets.mixkit.co/active_storage/sfx/3003/3003-preview.mp3" type="audio/mpeg">
+		</audio>
+
 		<script>
-			function displayTime() {
-				var elt = document.getElementById("clock");
-				var now = new Date();
-				elt.innerHTML = now.toLocaleTimeString();
-				setTimeout(displayTime, 1000);
+			// 粒子系统初始化
+			function initParticles() {
+				const scene = new THREE.Scene();
+				const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+				const renderer = new THREE.WebGLRenderer({
+					alpha: true
+				});
+				renderer.setSize(window.innerWidth, window.innerHeight);
+				document.getElementById('particles').appendChild(renderer.domElement);
+
+				const geometry = new THREE.BufferGeometry();
+				const vertices = [];
+				for (let i = 0; i < 5000; i++) {
+					vertices.push(
+						Math.random() * 2000 - 1000,
+						Math.random() * 2000 - 1000,
+						Math.random() * 2000 - 1000
+					);
+				}
+				geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+
+				const material = new THREE.PointsMaterial({
+					size: 2,
+					color: 0x00ffff,
+					transparent: true,
+					opacity: 0.5
+				});
+
+				const particles = new THREE.Points(geometry, material);
+				scene.add(particles);
+
+				camera.position.z = 1000;
+
+				function animate() {
+					requestAnimationFrame(animate);
+					particles.rotation.x += 0.0001;
+					particles.rotation.y += 0.0001;
+					renderer.render(scene, camera);
+				}
+				animate();
 			}
-			window.onload = displayTime;
+
+			// 主题切换系统
+			let isDarkMode = true;
+
+			function toggleTheme() {
+				isDarkMode = !isDarkMode;
+				document.documentElement.style.setProperty('--neon-blue', isDarkMode ? '#0ff' : '#f0f');
+				document.documentElement.style.setProperty('--neon-pink', isDarkMode ? '#f0f' : '#0ff');
+			}
+
+			// 音效控制系统
+			const bgm = document.getElementById('bgm');
+			let isMuted = true;
+
+			function toggleMusic() {
+				isMuted = !isMuted;
+				bgm[isMuted ? 'pause' : 'play']();
+			}
+
+			// 数据可视化系统
+			function initCharts() {
+				const ctx = document.getElementById('main-chart').getContext('2d');
+				new Chart(ctx, {
+					type: 'radar',
+					data: {
+						labels: ['攻防能力', '渗透测试', '漏洞挖掘', '逆向工程', '社会工程'],
+						datasets: [{
+							data: [95, 88, 92, 85, 90],
+							backgroundColor: 'rgba(0, 255, 255, 0.2)',
+							borderColor: '#0ff'
+						}]
+					},
+					options: {
+						scales: {
+							r: {
+								grid: {
+									color: 'rgba(0, 255, 255, 0.2)'
+								},
+								angleLines: {
+									color: 'rgba(0, 255, 255, 0.2)'
+								},
+								pointLabels: {
+									color: '#0ff'
+								}
+							}
+						}
+					}
+				});
+			}
+
+			// 系统监控
+			function updateSystemStats() {
+				const stats = {
+					cpu: Math.random() * 30 + 70,
+					mem: Math.random() * 20 + 80,
+					net: Math.random() * 50 + 50
+				};
+
+				document.getElementById('system-monitor').innerHTML = `
+                <div class="skill-bar">
+                    <span>CPU负载</span>
+                    <div class="skill-progress" style="width: ${stats.cpu}%"></div>
+                </div>
+                <div class="skill-bar">
+                    <span>内存占用</span>
+                    <div class="skill-progress" style="width: ${stats.mem}%"></div>
+                </div>
+                <div class="skill-bar">
+                    <span>网络吞吐</span>
+                    <div class="skill-progress" style="width: ${stats.net}%"></div>
+                </div>
+            `;
+			}
+
+			// 初始化
+			window.onload = () => {
+				initParticles();
+				initCharts();
+				setInterval(updateSystemStats, 2000);
+				document.querySelectorAll('.skill-progress').forEach(progress => {
+					progress.style.width = progress.style.width;
+				});
+			};
 		</script>
 	</body>
 </html>
