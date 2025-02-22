@@ -11,17 +11,37 @@
 				height: 200px;
 				background-color: aqua;
 			}
-			
-			.red{
+
+			.red {
 				color: red;
-				margin-top: 0px;
-				margin-left: 0px;
+				margin-top: -25px;
+				margin-left: 610px;
+			}
+
+			#clock {
+				font: bold 24pt sans;
+				background: #ddf;
+				padding: 10px;
+				border: solid black 2px;
+				border-radius: 10px;
 			}
 		</style>
 	</head>
 	<body>
 		<div class="ht">
-			<h1><p class="red">阿航的官方网站</p></h1>
+			<h1>
+				<p class="red">阿航的官方网站</p>
+			</h1>
+			<span id="clock"></span>
 		</div>
+		<script>
+			function displayTime() {
+				var elt = document.getElementById("clock");
+				var now = new Date();
+				elt.innerHTML = now.toLocaleTimeString();
+				setTimeout(displayTime, 1000);
+			}
+			window.onload = displayTime;
+		</script>
 	</body>
 </html>
