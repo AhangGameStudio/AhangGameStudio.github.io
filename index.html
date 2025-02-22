@@ -1,142 +1,264 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 	<head>
-		<meta charset="utf-8">
-		<title>登陆/注册页面</title>
+		<meta charset="UTF-8">
+		<title>用户登录注册系统</title>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 		<style>
 			body {
-				font-family: Arial, sans-serif;
+				font-family: '微软雅黑', Arial, sans-serif;
 				margin: 0;
-				padding: 0;
-				background-color: #e4e7ea;
+				padding: 20px;
+				background: linear-gradient(135deg, #e4e7ea, #f0daf1);
+				min-height: 100vh;
 			}
 
 			.container {
 				max-width: 500px;
-				margin: 0 auto;
-				display: flex;
-				flex-direction: column;
-				align-items: center;
-				justify-content: center;
-				height: 60vh;
+				margin: 50px auto;
+				padding: 20px;
 			}
 
 			.form {
-				background-color: rgb(175, 204, 227);
-				border-radius: 5px;
-				box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-				padding: 20px;
-				width: 100%;
-				max-width: 400px;
+				background: rgba(255, 255, 255, 0.9);
+				border-radius: 10px;
+				box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+				padding: 30px;
+				transition: transform 0.3s ease;
 			}
 
-			.form input {
-				display: block;
-				width: 94%;
-				border: none;
-				border-bottom: 1px solid #ccc;
-				padding: 10px;
+			.form:hover {
+				transform: translateY(-2px);
+			}
+
+			.form-header {
+				text-align: center;
+				margin-bottom: 25px;
+				color: #2c3e50;
+			}
+
+			.form-group {
 				margin-bottom: 20px;
-				font-size: 16px;
 			}
 
-			.form button {
-				display: block;
+			input {
 				width: 100%;
-				background-color: rgb(240, 218, 241);
-				color: #fff;
+				padding: 12px;
+				border: 2px solid #ddd;
+				border-radius: 5px;
+				font-size: 16px;
+				transition: border-color 0.3s ease;
+			}
+
+			input:focus {
+				border-color: #8e44ad;
+				outline: none;
+			}
+
+			button {
+				width: 100%;
+				padding: 12px;
+				background: #8e44ad;
+				color: white;
 				border: none;
 				border-radius: 5px;
-				padding: 10px;
-				font-size: 16px;
 				cursor: pointer;
+				font-size: 16px;
+				transition: background 0.3s ease;
 			}
 
-			.form label {
-				display: block;
-				font-weight: bold;
-				margin-bottom: 10px;
+			button:hover {
+				background: #732d91;
+			}
+
+			.toggle-form {
+				text-align: center;
+				margin-top: 20px;
+			}
+
+			.toggle-form a {
+				color: #8e44ad;
+				text-decoration: none;
+				cursor: pointer;
+				transition: color 0.3s ease;
+			}
+
+			.toggle-form a:hover {
+				color: #5e3370;
 			}
 
 			#clock {
-				font: bold 24pt sans;
-				background: #ddf;
-				padding: 10px;
-				border: solid black 2px;
-				border-radius: 10px;
-				margin-left: 690px;
+				position: fixed;
+				top: 20px;
+				right: 20px;
+				background: rgba(255, 255, 255, 0.9);
+				padding: 10px 20px;
+				border-radius: 5px;
+				box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 			}
 		</style>
 	</head>
 	<body>
 		<div class="container">
+			<!-- 登录表单 -->
 			<form class="form" id="login-form">
-				<h2>登陆</h2>
-				<label for="username">用户名</label>
-				<input type="text" id="username" name="username" placeholder="请输入用户名">
-				<label for="password">密码</label>
-				<input type="password" id="password" name="password" placeholder="请输入密码">
-				<button type="submit">登陆</button>
-				<p>没有账号？ <a href="#" id="register-link">马上注册</a></p>
+				<div class="form-header">
+					<h2>用户登录</h2>
+				</div>
+				<div class="form-group">
+					<input type="text" id="username" placeholder="用户名" required>
+				</div>
+				<div class="form-group">
+					<input type="password" id="password" placeholder="密码" required>
+				</div>
+				<button type="submit">立即登录</button>
+				<div class="toggle-form">
+					<span>没有账号？</span>
+					<a href="#" id="register-link">立即注册</a>
+				</div>
 			</form>
 
-			<form class="form" id="register-form" style="display:none;">
-				<h2>注册</h2>
-				<label for="r-username">用户名</label>
-				<input type="text" id="r-username" name="username" placeholder="请输入用户名">
-				<label for="r-password">密码</label>
-				<input type="password" id="r-password" name="password" placeholder="请输入密码">
-				<label for="confirm-password">确认密码</label>
-				<input type="password" id="confirm-password" name="confirm-password" placeholder="请再次输入密码">
-				<button type="submit">注册</button>
-				<p>已有账号？ <a href="#" id="login-link">返回登陆</a></p>
+			<!-- 注册表单 -->
+			<form class="form" id="register-form" style="display: none;">
+				<div class="form-header">
+					<h2>用户注册</h2>
+				</div>
+				<div class="form-group">
+					<input type="text" id="r-username" placeholder="用户名（至少4位）" required>
+				</div>
+				<div class="form-group">
+					<input type="password" id="r-password" placeholder="密码（至少6位）" required>
+				</div>
+				<div class="form-group">
+					<input type="password" id="confirm-password" placeholder="确认密码" required>
+				</div>
+				<button type="submit">立即注册</button>
+				<div class="toggle-form">
+					<span>已有账号？</span>
+					<a href="#" id="login-link">返回登录</a>
+				</div>
 			</form>
-
 		</div>
-		<span id="clock"></span>
+
+		<div id="clock"></div>
 
 		<script>
-			// 表单交互逻辑
+			// 用户数据存储（使用localStorage）
+			let users = JSON.parse(localStorage.getItem('users')) || {};
+
+			// DOM元素获取
 			const loginForm = document.getElementById('login-form');
 			const registerForm = document.getElementById('register-form');
 			const registerLink = document.getElementById('register-link');
 			const loginLink = document.getElementById('login-link');
 
+			// 密码加密函数
+			const encryptPassword = (password) => {
+				return CryptoJS.SHA256(password).toString();
+			};
+
+			// 登录表单处理
 			loginForm.addEventListener('submit', (e) => {
 				e.preventDefault();
+
 				const username = document.getElementById('username').value.trim();
 				const password = document.getElementById('password').value.trim();
 
+				// 表单验证
 				if (!username || !password) {
 					alert('用户名和密码不能为空！');
 					return;
 				}
 
-				// 以下二选一：
-				window.location.href = 'zym/index.html'; // 明确文件
-				// 或 window.location.href = 'zym/'; // 目录形式
+				// 用户存在性验证
+				if (!users[username]) {
+					alert('用户不存在，请先注册！');
+					return;
+				}
+
+				// 密码验证
+				const encryptedPassword = encryptPassword(password);
+				if (users[username].password !== encryptedPassword) {
+					alert('密码错误，请重新输入！');
+					return;
+				}
+
+				// 登录成功处理
+				sessionStorage.setItem('currentUser', username);
+				window.location.href = 'zym/index.html';
 			});
 
+			// 注册表单处理
+			registerForm.addEventListener('submit', (e) => {
+				e.preventDefault();
+
+				const username = document.getElementById('r-username').value.trim();
+				const password = document.getElementById('r-password').value.trim();
+				const confirm = document.getElementById('confirm-password').value.trim();
+
+				// 表单验证
+				if (!username || !password || !confirm) {
+					alert('请填写所有必填字段！');
+					return;
+				}
+
+				if (username.length < 4) {
+					alert('用户名至少需要4个字符！');
+					return;
+				}
+
+				if (password.length < 6) {
+					alert('密码长度不能少于6位！');
+					return;
+				}
+
+				if (password !== confirm) {
+					alert('两次输入的密码不一致！');
+					return;
+				}
+
+				if (users[username]) {
+					alert('该用户名已被注册！');
+					return;
+				}
+
+				// 加密存储
+				users[username] = {
+					password: encryptPassword(password)
+				};
+				localStorage.setItem('users', JSON.stringify(users));
+
+				// 注册成功处理
+				alert('注册成功！自动跳转到登录页面...');
+				loginForm.style.display = 'block';
+				registerForm.style.display = 'none';
+				document.getElementById('username').value = username;
+				document.getElementById('password').focus();
+			});
+
+			// 表单切换逻辑
 			registerLink.addEventListener('click', (e) => {
 				e.preventDefault();
 				loginForm.style.display = 'none';
 				registerForm.style.display = 'block';
+				document.getElementById('r-username').focus();
 			});
 
 			loginLink.addEventListener('click', (e) => {
 				e.preventDefault();
 				loginForm.style.display = 'block';
 				registerForm.style.display = 'none';
+				document.getElementById('username').focus();
 			});
-		</script>
-		<script>
-			function displayTime() {
-				var elt = document.getElementById("clock");
-				var now = new Date();
-				elt.innerHTML = now.toLocaleTimeString();
-				setTimeout(displayTime, 1000);
+
+			// 时钟功能
+			function updateClock() {
+				const now = new Date();
+				const clock = document.getElementById('clock');
+				clock.textContent = now.toLocaleTimeString('zh-CN');
+				setTimeout(updateClock, 1000);
 			}
-			window.onload = displayTime;
+			updateClock();
 		</script>
 	</body>
 </html>
