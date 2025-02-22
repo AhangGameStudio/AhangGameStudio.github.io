@@ -57,9 +57,20 @@
 				font-weight: bold;
 				margin-bottom: 10px;
 			}
+
+			#clock {
+				font: bold 24pt sans;
+				background: #ddf;
+				padding: 10px;
+				border: solid black 2px;
+				border-radius: 10px;
+				margin-top: 0px;
+				margin-left: 642px;
+			}
 		</style>
 	</head>
 	<body>
+		<span id="clock"></span>
 		<div class="container">
 			<form class="form" id="login-form">
 				<h2>登陆</h2>
@@ -112,6 +123,15 @@
 
 				//以上代码是一个简单的表单切换逻辑，根据两个链接的点击事件实现登录表单和注册表单的切换
 			});
+		</script>
+		<script>
+			function displayTime() {
+				var elt = document.getElementById("clock");
+				var now = new Date();
+				elt.innerHTML = now.toLocaleTimeString();
+				setTimeout(displayTime, 1000);
+			}
+			window.onload = displayTime;
 		</script>
 	</body>
 </html>
