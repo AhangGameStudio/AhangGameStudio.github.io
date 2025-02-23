@@ -112,34 +112,43 @@
 				margin: 30px 0;
 			}
 
-			.link-card {
-				padding: 15px;
-				background: rgba(0, 0, 0, 0.7);
-				border-radius: 12px;
-				text-align: center;
-				transition: all 0.3s;
-				border: 1px solid var(--neon-blue);
-				position: relative;
-				overflow: hidden;
+			@media (max-width: 768px) {
+				.login-card {
+					min-width: 120px;
+					padding: 10px 15px;
+					display: flex;
+					align-items: center;
+					justify-content: center;
+					position: relative;
+					overflow: visible;
+					/* 移除overflow:hidden */
+				}
+
+				.login-card p {
+					position: relative;
+					z-index: 2;
+					/* 确保文字在动画层之上 */
+					color: var(--neon-pink) !important;
+					font-size: 1.1em;
+					text-shadow: 0 0 10px var(--neon-pink);
+					margin: 0;
+				}
 			}
 
-			.link-card:hover {
-				transform: translateY(-5px);
-				box-shadow: 0 0 15px var(--neon-pink);
-			}
-
-			.link-card::before {
-				content: "";
+			.login-card::before {
+				content: "◆";
 				position: absolute;
-				top: -50%;
-				left: -50%;
-				width: 200%;
-				height: 200%;
-				background: linear-gradient(45deg,
-						transparent,
-						var(--neon-blue),
-						transparent);
-				animation: borderFlow 3s linear infinite;
+				left: 10px;
+				color: var(--neon-blue);
+				filter: drop-shadow(0 0 5px var(--neon-blue));
+			}
+
+			.login-card::after {
+				content: "◆";
+				position: absolute;
+				right: 10px;
+				color: var(--neon-blue);
+				filter: drop-shadow(0 0 5px var(--neon-blue));
 			}
 
 			@keyframes borderFlow {
@@ -259,8 +268,8 @@
 					<option value="bing">Bing</option>
 				</select>
 				<input type="text" class="search-input" id="searchInput" placeholder="输入搜索指令...">
-				<a href="Login/index.html" target="_blank" class="link-card" style="width: 100px">
-					<p style="color: var(--neon-pink)">≡ 登录系统</p>
+				<a href="Login/index.html" target="_blank" class="link-card login-card">
+					<p>◆ 神经接入 ◆</p>
 				</a>
 			</div>
 
