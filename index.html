@@ -2,14 +2,16 @@
 <html lang="zh-CN">
 	<head>
 		<meta charset="UTF-8">
-		<title>智能接待中心 - 客户服务门户</title>
+		<title>赛博接待中心 - 未来客户门户</title>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 		<style>
-			/* 基础样式 */
+			/* 赛博朋克基础样式 */
 			:root {
-				--primary-blue: #1a73e8;
-				--hover-blue: #1557b0;
-				--background: #f8f9fa;
-				--text-dark: #202124;
+				--neon-blue: #0ff;
+				--neon-pink: #f0f;
+				--matrix-green: #0f0;
+				--cyber-dark: #000814;
+				--terminal-text: #00ff00;
 			}
 
 			* {
@@ -19,10 +21,43 @@
 			}
 
 			body {
-				font-family: 'Segoe UI', system-ui, sans-serif;
-				background: var(--background);
-				color: var(--text-dark);
+				font-family: 'Orbitron', 'Segoe UI', sans-serif;
+				background: var(--cyber-dark);
+				color: var(--neon-blue);
 				min-height: 100vh;
+				overflow-x: hidden;
+			}
+
+			/* 动态网格背景 */
+			.cyber-grid {
+				position: fixed;
+				width: 100vw;
+				height: 100vh;
+				background-image:
+					linear-gradient(rgba(0, 255, 255, 0.1) 1px, transparent 1px),
+					linear-gradient(90deg, rgba(0, 255, 255, 0.1) 1px, transparent 1px);
+				background-size: 20px 20px;
+				z-index: -1;
+			}
+
+			/* 扫描线特效 */
+			@keyframes scanline {
+				0% {
+					transform: translateY(-100%);
+				}
+
+				100% {
+					transform: translateY(100vh);
+				}
+			}
+
+			.scanline {
+				position: fixed;
+				width: 100%;
+				height: 2px;
+				background: linear-gradient(transparent 0%, var(--matrix-green) 50%, transparent 100%);
+				animation: scanline 3s linear infinite;
+				z-index: 999;
 			}
 
 			/* 主容器 */
@@ -30,6 +65,10 @@
 				max-width: 1200px;
 				margin: 0 auto;
 				padding: 20px;
+				position: relative;
+				background: rgba(0, 0, 0, 0.8);
+				border: 2px solid var(--neon-blue);
+				box-shadow: 0 0 30px rgba(0, 255, 255, 0.2);
 			}
 
 			/* 搜索栏 */
@@ -43,23 +82,25 @@
 			.search-input {
 				flex: 1;
 				padding: 15px 25px;
-				border: 2px solid #dfe1e5;
+				border: 2px solid var(--neon-blue);
 				border-radius: 30px;
 				font-size: 16px;
+				background: rgba(0, 0, 0, 0.5);
+				color: var(--terminal-text);
 				transition: all 0.3s;
 			}
 
 			.search-input:focus {
-				border-color: var(--primary-blue);
-				box-shadow: 0 2px 8px rgba(26, 115, 232, 0.2);
+				box-shadow: 0 0 20px var(--neon-blue);
 				outline: none;
 			}
 
 			.engine-select {
 				padding: 0 15px;
-				border: 2px solid #dfe1e5;
+				border: 2px solid var(--neon-pink);
 				border-radius: 20px;
-				background: white;
+				background: rgba(0, 0, 0, 0.5);
+				color: var(--neon-blue);
 				cursor: pointer;
 			}
 
@@ -73,97 +114,142 @@
 
 			.link-card {
 				padding: 15px;
-				background: white;
+				background: rgba(0, 0, 0, 0.7);
 				border-radius: 12px;
 				text-align: center;
-				transition: transform 0.2s;
-				box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+				transition: all 0.3s;
+				border: 1px solid var(--neon-blue);
+				position: relative;
+				overflow: hidden;
 			}
 
 			.link-card:hover {
-				transform: translateY(-3px);
+				transform: translateY(-5px);
+				box-shadow: 0 0 15px var(--neon-pink);
+			}
+
+			.link-card::before {
+				content: "";
+				position: absolute;
+				top: -50%;
+				left: -50%;
+				width: 200%;
+				height: 200%;
+				background: linear-gradient(45deg,
+						transparent,
+						var(--neon-blue),
+						transparent);
+				animation: borderFlow 3s linear infinite;
+			}
+
+			@keyframes borderFlow {
+				0% {
+					transform: rotate(0deg);
+				}
+
+				100% {
+					transform: rotate(360deg);
+				}
 			}
 
 			.link-icon {
 				width: 48px;
 				height: 48px;
 				margin-bottom: 10px;
+				filter: drop-shadow(0 0 5px var(--neon-blue));
 			}
 
 			/* AI对话框 */
 			.chat-container {
-				background: white;
+				background: rgba(0, 0, 0, 0.7);
 				border-radius: 15px;
-				box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 				margin: 40px 0;
 				overflow: hidden;
+				border: 2px solid var(--neon-pink);
+				box-shadow: 0 0 20px rgba(255, 0, 255, 0.2);
 			}
 
 			.chat-header {
 				padding: 20px;
-				background: var(--primary-blue);
-				color: white;
+				background: linear-gradient(90deg, var(--neon-blue), var(--neon-pink));
+				color: black;
+				text-shadow: 0 0 10px var(--neon-blue);
 			}
 
 			.chat-messages {
 				height: 400px;
 				padding: 20px;
 				overflow-y: auto;
+				background: rgba(0, 0, 0, 0.5);
 			}
 
 			.message {
 				margin: 15px 0;
 				max-width: 80%;
+				padding: 12px 18px;
+				border-radius: 18px;
+				position: relative;
 			}
 
 			.user-message {
-				background: #e8f0fe;
-				padding: 12px 18px;
-				border-radius: 18px 18px 4px 18px;
+				background: linear-gradient(90deg, rgba(0, 255, 255, 0.2), transparent);
 				margin-left: auto;
+				border: 1px solid var(--neon-blue);
 			}
 
 			.bot-message {
-				background: #f1f3f4;
-				padding: 12px 18px;
-				border-radius: 18px 18px 18px 4px;
+				background: linear-gradient(90deg, rgba(255, 0, 255, 0.2), transparent);
+				border: 1px solid var(--neon-pink);
 			}
 
 			.chat-input {
 				display: flex;
 				padding: 20px;
-				border-top: 1px solid #eee;
+				border-top: 1px solid var(--neon-blue);
+				background: rgba(0, 0, 0, 0.7);
 			}
 
 			.chat-textarea {
 				flex: 1;
 				padding: 12px;
-				border: 2px solid #dfe1e5;
+				border: 2px solid var(--neon-blue);
 				border-radius: 20px;
 				resize: none;
 				margin-right: 10px;
+				background: rgba(0, 0, 0, 0.5);
+				color: var(--terminal-text);
 			}
 
 			.send-button {
 				padding: 12px 25px;
-				background: var(--primary-blue);
-				color: white;
+				background: var(--neon-pink);
+				color: black;
 				border: none;
 				border-radius: 20px;
 				cursor: pointer;
-				transition: background 0.3s;
+				transition: all 0.3s;
+				font-weight: bold;
 			}
 
 			.send-button:hover {
-				background: var(--hover-blue);
+				background: var(--neon-blue);
+				box-shadow: 0 0 15px var(--neon-blue);
 			}
 
-			.dl {
-				margin-top: auto;
+			/* 粒子背景 */
+			#particles {
+				position: fixed;
+				width: 100%;
+				height: 100%;
+				z-index: -2;
 			}
 		</style>
 	</head>
 	<body>
+		<div class="cyber-grid"></div>
+		<div class="scanline"></div>
+		<div id="particles"></div>
+
 		<div class="container">
 			<!-- 搜索栏 -->
 			<div class="search-bar">
@@ -172,9 +258,9 @@
 					<option value="baidu">百度</option>
 					<option value="bing">Bing</option>
 				</select>
-				<input type="text" class="search-input" id="searchInput" placeholder="请输入搜索内容...">
-				<a href="Login/index.html" target="_blank" class="link-card">
-					<p>登录</p>
+				<input type="text" class="search-input" id="searchInput" placeholder="输入搜索指令...">
+				<a href="Login/index.html" target="_blank" class="link-card" style="width: 100px">
+					<p style="color: var(--neon-pink)">≡ 登录系统</p>
 				</a>
 			</div>
 
@@ -200,17 +286,59 @@
 			<!-- AI对话框 -->
 			<div class="chat-container">
 				<div class="chat-header">
-					<h3>智能客服助手</h3>
+					<h3>⨀ 神经接口客服系统 ⨀</h3>
 				</div>
 				<div class="chat-messages" id="chatMessages"></div>
 				<div class="chat-input">
-					<textarea class="chat-textarea" id="messageInput" placeholder="输入您的问题..." rows="1"></textarea>
-					<button class="send-button" onclick="sendMessage()">发送</button>
+					<textarea class="chat-textarea" id="messageInput" placeholder="输入交互指令..." rows="1"></textarea>
+					<button class="send-button" onclick="sendMessage()">↘ 执行</button>
 				</div>
 			</div>
 		</div>
 
 		<script>
+			// 粒子背景系统
+			function initParticles() {
+				const scene = new THREE.Scene();
+				const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+				const renderer = new THREE.WebGLRenderer({
+					alpha: true
+				});
+				renderer.setSize(window.innerWidth, window.innerHeight);
+				document.getElementById('particles').appendChild(renderer.domElement);
+
+				const geometry = new THREE.BufferGeometry();
+				const vertices = [];
+				for (let i = 0; i < 5000; i++) {
+					vertices.push(
+						Math.random() * 2000 - 1000,
+						Math.random() * 2000 - 1000,
+						Math.random() * 2000 - 1000
+					);
+				}
+				geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+
+				const material = new THREE.PointsMaterial({
+					size: 1.5,
+					color: 0x00ffff,
+					transparent: true,
+					opacity: 0.7
+				});
+
+				const particles = new THREE.Points(geometry, material);
+				scene.add(particles);
+
+				camera.position.z = 1000;
+
+				function animate() {
+					requestAnimationFrame(animate);
+					particles.rotation.x += 0.0001;
+					particles.rotation.y += 0.0001;
+					renderer.render(scene, camera);
+				}
+				animate();
+			}
+
 			// 搜索引擎功能
 			const searchInput = document.getElementById('searchInput');
 			const engineSelect = document.getElementById('engine');
@@ -255,12 +383,11 @@
 
 			function simulateAIResponse(question) {
 				const responses = {
-					'你好': '您好！有什么可以帮助您的？',
-					'联系方式': '我们的客服电话：400-123-4567',
-					'工作时间': '服务时间：每天9:00-21:00',
-					'默认': '已记录您的问题，稍后将由专人回复。'
+					'你好': '【系统】欢迎访问赛博空间站',
+					'联系方式': '【加密频道】请联系终端管理员',
+					'帮助': '【指令列表】1.状态查询 2.系统诊断 3.安全协议',
+					'默认': '【信号接收中】...正在解析量子信号...'
 				};
-
 				return responses[question] || responses['默认'];
 			}
 
@@ -271,7 +398,6 @@
 				appendMessage(message, true);
 				messageInput.value = '';
 
-				// 模拟AI回复延迟
 				setTimeout(() => {
 					const response = simulateAIResponse(message);
 					appendMessage(response, false);
@@ -284,10 +410,11 @@
 				this.style.height = this.scrollHeight + 'px';
 			});
 
-			// 初始化问候语
+			// 初始化
 			window.onload = () => {
+				initParticles();
 				setTimeout(() => {
-					appendMessage('您好！欢迎使用智能客服系统，请问有什么可以帮您？', false);
+					appendMessage('【系统就绪】量子通道已加密', false);
 				}, 500);
 			};
 		</script>
